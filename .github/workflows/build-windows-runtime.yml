@@ -1,0 +1,45 @@
+name: Build Windows x64 runtime
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: windows-runtime-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-windows-x64:
+    name: Native Windows x64 build and smoke
+    runs-on: windows-2025
+    timeout-minutes: 45
+
+    steps:
+      - name: Check out build inputs
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24.8.0
+          package-manager-cache: false
+
+      - name: Install locked Node.js dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Build unsigned Windows x64 runtime bundle
+        run: npm run runtime:build:win32-x64
+
+      - name: Verify packaged Windows x64 runtime bundle
+        run: npm run runtime:verify:win32-x64
+
+      - name: Upload engineering build evidence
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: markitdown-runtime-1.4.0-windows-ci.1-win32-x64
+          path: release/runtime-ci/1.4.0-windows-ci.1/*
+          if-no-files-found: error
+          retention-days: 30
+          compression-level: 0

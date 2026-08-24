@@ -1,0 +1,5 @@
+-r base.txt
+-r pdf.txt
+-r docx.txt
+-r pptx.txt
+-r xls.txt
