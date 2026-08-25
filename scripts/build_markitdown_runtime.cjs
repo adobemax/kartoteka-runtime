@@ -240,9 +240,8 @@ class SitePackagesLocator {
 
   async locate(python) {
     const script = [
-      'import json, site',
-      'paths = site.getsitepackages()',
-      'print(json.dumps(paths[0]))'
+      'import json, sysconfig',
+      'print(json.dumps(sysconfig.get_path("purelib")))'
     ].join('; ')
     const result = await this.runner.checked(
       {
@@ -252,7 +251,16 @@ class SitePackagesLocator {
       },
       'site-packages lookup'
     )
-    return JSON.parse(result.stdout.trim())
+    const sitePackages = JSON.parse(result.stdout.trim())
+    const sitePackagesStat = await stat(sitePackages).catch((error) => {
+      throw new BuildError(`Resolved site-packages directory does not exist: ${sitePackages}`, {
+        cause: error
+      })
+    })
+    if (!sitePackagesStat.isDirectory()) {
+      throw new BuildError(`Resolved site-packages path is not a directory: ${sitePackages}`)
+    }
+    return sitePackages
   }
 }
 
@@ -293,6 +301,7 @@ class RuntimeBundleBuilder {
       await this.copyWorker(paths)
       this.log('write dependency inventory')
       const packageInventory = await this.createPackageInventory(paths)
+      this.assertPackageInventory(packageInventory)
       this.log('run smoke')
       await this.smokePayload(paths, pythonExecutable)
       this.log('write payload metadata')
@@ -499,6 +508,17 @@ class RuntimeBundleBuilder {
       },
       'JSONL worker smoke'
     )
+  }
+
+  assertPackageInventory(packages) {
+    const markItDown = packages.find(
+      (entry) => typeof entry.name === 'string' && entry.name.toLowerCase() === 'markitdown'
+    )
+    if (markItDown?.version !== MARKITDOWN_VERSION) {
+      throw new BuildError(
+        `Copied package inventory must contain markitdown ${MARKITDOWN_VERSION}; found ${markItDown?.version ?? 'missing'}`
+      )
+    }
   }
 
   async writePayloadMetadata(paths, pythonExecutable, packageInventory) {
