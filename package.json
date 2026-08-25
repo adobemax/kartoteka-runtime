@@ -5,7 +5,7 @@
   "description": "Native build workflows for Kartoteka MarkItDown runtime bundles",
   "scripts": {
     "runtime:build:win32-x64": "node scripts/build_markitdown_runtime.cjs win32-x64",
-    "runtime:verify:win32-x64": "node scripts/verify_markitdown_runtime.cjs release/runtime-ci/1.4.0-windows-ci.1/markitdown-runtime-1.4.0-win32-x64.tar.gz"
+    "runtime:verify:win32-x64": "node scripts/verify_markitdown_runtime.cjs release/runtime-ci/1.4.0-rc.3/markitdown-runtime-1.4.0-win32-x64.tar.gz"
   },
   "engines": {
     "node": ">=20"

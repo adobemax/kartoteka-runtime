@@ -251,7 +251,7 @@ async function main() {
       PROJECT_ROOT,
       'release',
       'runtime-ci',
-      '1.4.0-windows-ci.1',
+      '1.4.0-rc.3',
       'markitdown-runtime-1.4.0-win32-x64.tar.gz'
     )
   const verifier = new RuntimeArtifactVerifier(artifactPath)

@@ -9,7 +9,6 @@ const {
   cp,
   mkdir,
   mkdtemp,
-  readFile,
   readdir,
   rename,
   rm,
@@ -23,7 +22,8 @@ const { pipeline } = require('node:stream/promises')
 const tar = require('tar')
 
 const PROJECT_ROOT = resolve(__dirname, '..')
-const RUNTIME_VERSION = '1.4.0-windows-ci.1'
+const RELEASE_TAG = 'runtime-v1.4.0-rc.3'
+const RUNTIME_VERSION = '1.4.0-rc.3'
 const APP_VERSION = '1.4.0'
 const MARKITDOWN_VERSION = '0.1.6'
 const PYTHON_VERSION = '3.12.13'
@@ -282,7 +282,7 @@ class RuntimeBundleBuilder {
       this.outputDirectory,
       `markitdown-runtime-${APP_VERSION}-${targetName}.metadata.json`
     )
-    this.checksumsPath = join(this.outputDirectory, 'SHA256SUMS.txt')
+    this.checksumsPath = join(this.outputDirectory, 'SHA256SUMS.win32-x64.txt')
   }
 
   async build() {
@@ -590,7 +590,8 @@ class RuntimeBundleBuilder {
       name: this.artifactName,
       path: this.artifactPath,
       size: artifactSize,
-      sha256: artifactSha256
+      sha256: artifactSha256,
+      url: `https://github.com/adobemax/kartoteka-runtime/releases/download/${RELEASE_TAG}/${this.artifactName}`
     }
   }
 
@@ -598,7 +599,8 @@ class RuntimeBundleBuilder {
     const portableArtifact = {
       name: artifact.name,
       size: artifact.size,
-      sha256: artifact.sha256
+      sha256: artifact.sha256,
+      url: artifact.url
     }
     await writeFile(
       this.metadataPath,
