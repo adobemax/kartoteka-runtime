@@ -5,7 +5,14 @@
   "description": "Native build workflows for Kartoteka MarkItDown runtime bundles",
   "scripts": {
     "runtime:build:win32-x64": "node scripts/build_markitdown_runtime.cjs win32-x64",
-    "runtime:verify:win32-x64": "node scripts/verify_markitdown_runtime.cjs release/runtime-ci/1.4.0-rc.3/markitdown-runtime-1.4.0-win32-x64.tar.gz"
+    "runtime:verify:win32-x64": "node scripts/verify_markitdown_runtime.cjs release/runtime-ci/1.4.0-rc.3/markitdown-runtime-1.4.0-win32-x64.tar.gz",
+    "media:source:download": "bash scripts/download_ffmpeg_source.sh",
+    "media:source:verify": "bash scripts/verify_ffmpeg_source.sh",
+    "media:build:darwin-arm64": "bash scripts/build_media_runtime.sh darwin-arm64",
+    "media:build:darwin-x64": "bash scripts/build_media_runtime.sh darwin-x64",
+    "media:build:win32-x64": "bash scripts/build_media_runtime.sh win32-x64",
+    "media:verify": "node scripts/verify_media_runtime.cjs",
+    "media:release:assemble": "node scripts/assemble_media_runtime_release.cjs"
   },
   "engines": {
     "node": ">=20"

@@ -1,0 +1,77 @@
+name: Build media runtime for macOS
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: media-runtime-macos-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build and verify ${{ matrix.target }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: darwin-arm64
+            runner: macos-15
+          - target: darwin-x64
+            runner: macos-15-intel
+
+    steps:
+      - name: Check out build inputs
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24.8.0
+          package-manager-cache: false
+
+      - name: Install locked Node.js dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Ensure signature verification is available
+        run: command -v gpg >/dev/null 2>&1 || brew install gnupg
+
+      - name: Download and verify official FFmpeg source
+        run: |
+          npm run media:source:download
+          npm run media:source:verify
+
+      - name: Build unsigned LGPL media runtime
+        run: npm run media:build:${{ matrix.target }}
+
+      - name: Verify codecs, probing, chunk extraction, silence detection, and Unicode paths
+        run: >-
+          npm run media:verify --
+          release/media-runtime-ci/1.0.0-rc.1/media-runtime-ffmpeg-9.0.1-${{ matrix.target }}.tar.gz
+          ${{ matrix.target }}
+
+      - name: Upload engineering build evidence
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: media-runtime-1.0.0-rc.1-${{ matrix.target }}
+          path: release/media-runtime-ci/1.0.0-rc.1/*${{ matrix.target }}*
+          if-no-files-found: error
+          retention-days: 30
+          compression-level: 0
+
+      - name: Upload verified source evidence once
+        if: matrix.target == 'darwin-arm64'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: media-runtime-1.0.0-rc.1-source
+          path: |
+            release/media-source/ffmpeg-9.0.1.tar.xz
+            release/media-source/ffmpeg-9.0.1.tar.xz.asc
+            release/media-source/ffmpeg-devel.asc
+          if-no-files-found: error
+          retention-days: 30
+          compression-level: 0
