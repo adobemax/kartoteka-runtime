@@ -90,7 +90,11 @@ class MediaRuntimePackager {
       const bin = join(payload, 'bin')
       const licenses = join(payload, 'LICENSES')
       const metadata = join(payload, 'metadata')
-      await Promise.all([mkdir(bin, { recursive: true }), mkdir(licenses), mkdir(metadata)])
+      await Promise.all([
+        mkdir(bin, { recursive: true }),
+        mkdir(licenses, { recursive: true }),
+        mkdir(metadata, { recursive: true })
+      ])
       await Promise.all([
         copyFile(ffmpeg, join(bin, basename(ffmpeg))),
         copyFile(ffprobe, join(bin, basename(ffprobe))),
