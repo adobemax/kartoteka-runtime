@@ -127,7 +127,7 @@ class MediaRuntimeVerifier {
       ['aac', ['-c:a', 'aac', '-b:a', '32k', '-f', 'adts']],
       ['flac', ['-c:a', 'flac']],
       ['ogg', ['-c:a', 'flac', '-f', 'ogg']],
-      ['webm', ['-c:a', 'vorbis', '-strict', 'experimental', '-f', 'webm']]
+      ['webm', ['-ac', '2', '-c:a', 'vorbis', '-strict', 'experimental', '-f', 'webm']]
     ]
     const paths = []
     for (const [extension, args] of requests) {

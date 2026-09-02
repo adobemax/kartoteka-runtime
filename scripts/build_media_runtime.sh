@@ -24,6 +24,7 @@ elif command -v sysctl >/dev/null 2>&1; then
 fi
 
 configure_args=(
+  --disable-everything
   --disable-gpl
   --disable-version3
   --disable-nonfree
@@ -35,16 +36,29 @@ configure_args=(
   --disable-shared
   --enable-static
   --disable-x86asm
+  --enable-small
+  --enable-ffmpeg
+  --enable-ffprobe
+  --enable-protocol=file,pipe
+  --enable-demuxer=wav,mp3,mov,aac,flac,ogg,matroska
+  --enable-decoder=pcm_u8,pcm_s16le,pcm_s24le,pcm_s32le,pcm_f32le,pcm_f64le,pcm_alaw,pcm_mulaw,mp3,aac,flac,vorbis,opus
+  --enable-parser=aac,mpegaudio,vorbis,opus
+  --enable-encoder=pcm_s16le,aac,flac,vorbis
+  --enable-muxer=wav,ipod,adts,flac,ogg,webm,null
+  --enable-filter=aresample,aformat,silencedetect
   --extra-cflags=-O2
 )
 
 if [[ "$target" == "win32-x64" ]]; then
   configure_args+=(--target-os=mingw32 --arch=x86_64)
+  build_targets=(ffmpeg.exe ffprobe.exe)
+else
+  build_targets=(ffmpeg ffprobe)
 fi
 
 cd "$source_root"
 ./configure "${configure_args[@]}"
-make -j"$jobs" ffmpeg ffprobe
+make -j"$jobs" "${build_targets[@]}"
 cd "$project_root"
 if [[ "${SKIP_MEDIA_PACKAGE:-0}" != "1" ]]; then
   node scripts/package_media_runtime.cjs "$target" "$source_root"

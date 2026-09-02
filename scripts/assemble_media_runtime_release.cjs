@@ -91,6 +91,7 @@ class MediaRuntimeReleaseAssembler {
       platform: target.platform,
       arch: target.arch,
       layout: metadata.layout,
+      buildConfiguration: metadata.buildConfiguration,
       archive: {
         name: metadata.archive.name,
         format: 'tar.gz',
