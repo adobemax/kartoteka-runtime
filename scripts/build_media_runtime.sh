@@ -40,11 +40,14 @@ configure_args=(
 
 if [[ "$target" == "win32-x64" ]]; then
   configure_args+=(--target-os=mingw32 --arch=x86_64)
+  build_targets=(ffmpeg.exe ffprobe.exe)
+else
+  build_targets=(ffmpeg ffprobe)
 fi
 
 cd "$source_root"
 ./configure "${configure_args[@]}"
-make -j"$jobs" ffmpeg ffprobe
+make -j"$jobs" "${build_targets[@]}"
 cd "$project_root"
 if [[ "${SKIP_MEDIA_PACKAGE:-0}" != "1" ]]; then
   node scripts/package_media_runtime.cjs "$target" "$source_root"
