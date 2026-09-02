@@ -24,6 +24,7 @@ elif command -v sysctl >/dev/null 2>&1; then
 fi
 
 configure_args=(
+  --disable-everything
   --disable-gpl
   --disable-version3
   --disable-nonfree
@@ -35,6 +36,16 @@ configure_args=(
   --disable-shared
   --enable-static
   --disable-x86asm
+  --enable-small
+  --enable-ffmpeg
+  --enable-ffprobe
+  --enable-protocol=file,pipe
+  --enable-demuxer=wav,mp3,mov,aac,flac,ogg,matroska
+  --enable-decoder=pcm_u8,pcm_s16le,pcm_s24le,pcm_s32le,pcm_f32le,pcm_f64le,pcm_alaw,pcm_mulaw,mp3,aac,flac,vorbis,opus
+  --enable-parser=aac,mpegaudio,vorbis,opus
+  --enable-encoder=pcm_s16le,aac,flac,vorbis
+  --enable-muxer=wav,ipod,adts,flac,ogg,webm,null
+  --enable-filter=aresample,aformat,silencedetect
   --extra-cflags=-O2
 )
 
