@@ -2,6 +2,13 @@ name: Build media runtime for macOS
 
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - .github/workflows/build-media-runtime-macos.yml
+      - package-lock.json
+      - package.json
+      - scripts/**
+      - tests/fixtures/audio/**
 
 permissions:
   contents: read
